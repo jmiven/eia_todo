@@ -1,7 +1,9 @@
 defmodule Todo.PoolSupervisor do
   use Supervisor
+  require Logger
 
   def start_link(db_folder, pool_size) do
+    Logger.debug "Starting the PoolSupervisor"
     Supervisor.start_link(__MODULE__, {db_folder, pool_size})
   end
 
