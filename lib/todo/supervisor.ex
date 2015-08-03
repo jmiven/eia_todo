@@ -1,8 +1,10 @@
 defmodule Todo.Supervisor do
   use Supervisor
+  require Logger
 
   # Interface functions
   def start_link do
+    Logger.debug "Starting the top-level supervisor"
     Supervisor.start_link(__MODULE__, nil)
   end
 
@@ -10,11 +12,9 @@ defmodule Todo.Supervisor do
   def init(_) do
     processes = [
       worker(Todo.ProcessRegistry, []),
-      supervisor(Todo.Database, ["./persist/"]),
-      supervisor(Todo.ServerSupervisor, []),
-      worker(Todo.Cache, [])
+      supervisor(Todo.TodoSupervisor, [])
     ]
-    supervise(processes, strategy: :one_for_one)
+    supervise(processes, strategy: :rest_for_one)
   end
 
 end
