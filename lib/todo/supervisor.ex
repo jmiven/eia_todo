@@ -11,6 +11,7 @@ defmodule Todo.Supervisor do
     processes = [
       worker(Todo.ProcessRegistry, []),
       supervisor(Todo.Database, ["./persist/"]),
+      supervisor(Todo.ServerSupervisor, []),
       worker(Todo.Cache, [])
     ]
     supervise(processes, strategy: :one_for_one)
