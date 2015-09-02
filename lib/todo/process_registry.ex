@@ -1,6 +1,6 @@
 defmodule Todo.ProcessRegistry do
+  @compile {:parse_transform, :ms_transform}
   use GenServer
-  import Kernel, except: [send: 2]
   require Logger
 
   def start_link do
@@ -17,7 +17,10 @@ defmodule Todo.ProcessRegistry do
   end
 
   def whereis_name(key) do
-    GenServer.call(:process_registry, {:whereis_name, key})
+    case :ets.lookup(:todo_process_registry, key) do
+      [{^key, pid}] -> pid
+      _ -> :undefined
+    end
   end
 
   def send(key, message) do
@@ -31,44 +34,31 @@ defmodule Todo.ProcessRegistry do
 
 
   def init(_) do
-    {:ok, HashDict.new}
+    :ets.new(:todo_process_registry, [:set, :named_table, :protected])
+    {:ok, nil}
   end
 
-  def handle_call({:register_name, key, pid}, _, process_registry) do
-    case HashDict.get(process_registry, key) do
-      nil ->
+  def handle_call({:register_name, key, pid}, _, state) do
+    case whereis_name(key) do
+      :undefined ->
         Process.monitor(pid)
-        {:reply, :yes, HashDict.put(process_registry, key, pid)}
+        :ets.insert(:todo_process_registry, {key, pid})
+        {:reply, :yes, state}
       _ ->
-        {:reply, :no, process_registry}
+        {:reply, :no, state}
     end
   end
 
-  def handle_call({:unregister_name, key}, _, process_registry) do
-    {:reply, key, HashDict.delete(process_registry, key)}
+  def handle_call({:unregister_name, key}, _, state) do
+    :ets.delete(:todo_process_registry, key)
+    {:reply, key, state}
   end
 
-  def handle_call({:whereis_name, key}, _, process_registry) do
-    {:reply, HashDict.get(process_registry, key, :undefined), process_registry}
-  end
-
-  def handle_info({:DOWN, _, :process, pid, _}, process_registry) do
-    {:noreply, deregister_pid(process_registry, pid)}
+  def handle_info({:DOWN, _, :process, terminated_pid, _}, state) do
+    :ets.match_delete(:todo_process_registry, {:_, terminated_pid})
+    {:noreply, state}
   end
 
   def handle_info(_, state), do: {:noreply, state}
-
-
-  defp deregister_pid(process_registry, pid) do
-    Enum.reduce(
-      process_registry,
-      process_registry,
-      fn
-        ({ralias, rprocess}, registry_acc) when rprocess == pid ->
-          HashDict.delete(registry_acc, ralias)
-        (_, registry_acc) -> registry_acc
-      end
-    )
-  end
 
 end
