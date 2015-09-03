@@ -1,5 +1,4 @@
 defmodule Todo.ProcessRegistry do
-  @compile {:parse_transform, :ms_transform}
   use GenServer
   require Logger
 
