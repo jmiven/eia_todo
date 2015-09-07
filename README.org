@@ -1,0 +1,5 @@
+* About
+Most, if not all, of the code originates from the [[http://www.manning.com/juric][Elixir in Action]] book.
+* Todo
+** TODO Replace Todo.ProcessRegistry with gproc
+See section 11.2 page 274
