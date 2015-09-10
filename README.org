@@ -2,4 +2,6 @@
 Most, if not all, of the code originates from the [[http://www.manning.com/juric][Elixir in Action]] book.
 * Todo
 ** TODO Add tests
+** TODO Queue the requests to Todo.Server?
+pp. 285-286
 ** TODO Mesure & optimize performance (p. 284)
