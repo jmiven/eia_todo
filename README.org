@@ -3,6 +3,3 @@ Most, if not all, of the code originates from the [[http://www.manning.com/juric
 * Todo
 ** TODO Add tests
 ** TODO Mesure & optimize performance (p. 284)
-** DONE Replace Todo.ProcessRegistry with gproc
-CLOSED: [2015-09-11 Fri 00:44]
-See section 11.2 page 274
