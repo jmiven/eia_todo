@@ -7,11 +7,11 @@ defmodule Todo.Web do
   @default_port 5454
 
   def start_server do
-    port = case Application.get_env(:todo, :port) do
-             nil -> @default_port
-             port -> port
-    end
-    {:ok, _} = Plug.Adapters.Cowboy.http(__MODULE__, [], port: port)
+    {:ok, _} = Plug.Adapters.Cowboy.http(
+      __MODULE__,
+      [],
+      port: Application.get_env(:todo, :port) || @default_port
+    )
   end
 
   post "/add_entry" do
